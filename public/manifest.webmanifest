@@ -1,0 +1,15 @@
+{
+  "name": "Offcut — local-first video editor",
+  "short_name": "Offcut",
+  "description": "Cut, caption and export short-form video entirely on your device. No account, no upload, no watermark.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0c0b",
+  "theme_color": "#131412",
+  "categories": ["video", "photo", "productivity"],
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
