@@ -164,4 +164,4 @@ export interface Project {
   assets: Asset[];
 }
 
-export type PanelId = 'media' | 'text' | 'captions' | 'voice' | 'looks' | 'transitions' | 'script' | 'inspector' | null;
+export type PanelId = 'media' | 'text' | 'captions' | 'voice' | 'looks' | 'transitions' | 'script' | 'tracking' | 'inspector' | null;

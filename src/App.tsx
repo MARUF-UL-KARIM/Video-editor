@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Captions, ChevronDown, Code2, Film, Mic, Palette, SlidersHorizontal, Type, Upload, Zap } from 'lucide-react';
+import { Captions, ChevronDown, Code2, Crosshair, Film, Mic, Palette, SlidersHorizontal, Type, Upload, Zap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
 import { ExportDialog } from './components/ExportDialog';
 import { Inspector } from './components/Inspector';
@@ -9,6 +9,7 @@ import { MediaPanel } from './components/panels/MediaPanel';
 import { ScriptPanel } from './components/panels/ScriptPanel';
 import { TextPanel } from './components/panels/TextPanel';
 import { VoicePanel } from './components/panels/VoicePanel';
+import { TrackingPanel } from './components/panels/TrackingPanel';
 import { Preview, Transport } from './components/Preview';
 import { Timeline } from './components/Timeline';
 import { TopBar } from './components/TopBar';
@@ -28,6 +29,7 @@ const TABS: { id: Exclude<PanelId, null | 'inspector'>; label: string; icon: Com
   { id: 'looks', label: 'Looks', icon: Palette },
   { id: 'transitions', label: 'Transitions', icon: Zap },
   { id: 'script', label: 'Script', icon: Code2 },
+  { id: 'tracking', label: 'Track', icon: Crosshair },
 ];
 
 function useCompact() {
@@ -58,6 +60,8 @@ function PanelBody({ id, onImport }: { id: PanelId; onImport: () => void }) {
       return <TransitionsPanel />;
     case 'script':
       return <ScriptPanel />;
+    case 'tracking':
+      return <TrackingPanel />;
     case 'inspector':
       return <Inspector />;
     default:
