@@ -1,6 +1,6 @@
 import { Crosshair, Plus, Trash2 } from 'lucide-react';
 import { useMemo } from 'react';
-import { getState, useStore } from '../../lib/store';
+import { clipValue, getState, useStore } from '../../lib/store';
 
 /** Keyframe-based planar/object tracking controls. Tracking data is stored as native clip animation curves. */
 export function TrackingPanel() {
@@ -14,14 +14,15 @@ export function TrackingPanel() {
   const addAnchor = () => {
     if (!clip) return;
     const state = getState();
-    const currentX = state.project.clips.find((c) => c.id === clip.id)?.x ?? clip.x;
-    const currentY = state.project.clips.find((c) => c.id === clip.id)?.y ?? clip.y;
-    for (const [prop, value] of [['x', currentX], ['y', currentY]] as const) {
-      const frames = [...(clip.keyframes[prop] ?? [])].filter((f) => Math.abs(f.t - local) > 1 / state.project.fps);
-      frames.push({ t: local, v: value, ease: 'easeInOut' });
+    const current = state.project.clips.find((c) => c.id === clip.id) ?? clip;
+    const keyframes = { ...current.keyframes };
+    for (const prop of ['x', 'y'] as const) {
+      const frames = [...(keyframes[prop] ?? [])].filter((f) => Math.abs(f.t - local) > 1 / state.project.fps);
+      frames.push({ t: local, v: clipValue(current, prop, local), ease: 'easeInOut' });
       frames.sort((a, b) => a.t - b.t);
-      state.updateClip(clip.id, { keyframes: { ...clip.keyframes, [prop]: frames } });
+      keyframes[prop] = frames;
     }
+    state.updateClip(clip.id, { keyframes });
     state.toast('Tracking anchor added at the playhead.', 'ok');
   };
 
