@@ -24,6 +24,7 @@ class Engine {
   private dirty = true;
   private raf = 0;
   private tickNo = 0;
+  private lastRenderFrame = -1;
   private playT0 = 0;
   private playC0 = 0;
   private useAudioClock = true;
@@ -263,7 +264,9 @@ class Engine {
         t = dur;
         this.pause();
       }
-      if (t !== s.time) useStore.setState({ time: t });
+      // The timeline and inspectors subscribe to time; publishing at 60/120 Hz forces
+      // expensive UI work even when the project is 24/30 fps. Publish once per frame.
+      if (Math.floor(t * project.fps) !== Math.floor(s.time * project.fps)) useStore.setState({ time: t });
     }
     if (project !== this.lastProject) {
       this.lastProject = project;
@@ -273,8 +276,13 @@ class Engine {
     this.syncVideos(project, layers, t, useStore.getState().playing);
     if (!this.comp) return;
     const seeking = layers.some((l) => l.clip.type === 'video' && this.videos.get(l.clip.id)?.el.seeking);
-    if (this.dirty || s.playing || seeking) {
+    // Rendering every display refresh needlessly re-uploads every video texture and reruns
+    // all fragment effects. Render at project frame cadence instead (and still immediately
+    // when paused/seeked/edited).
+    const renderFrame = Math.floor(t * project.fps + 1e-4);
+    if ((this.dirty || s.playing || seeking) && (!s.playing || renderFrame !== this.lastRenderFrame || seeking)) {
       this.dirty = false;
+      this.lastRenderFrame = renderFrame;
       const items = buildDrawItems(project, layers, {
         video: (c) => this.videos.get(c.id)?.el ?? null,
         stamp: (c) => this.videos.get(c.id)?.el.currentTime ?? 0,
